@@ -3,6 +3,7 @@ const { addExpense, getExpenses, deleteExpense, updateExpense } = require("../co
 const { addSaving, getSavings, deleteSaving, updateSaving } = require("../controllers/saving");
 const { addInvestment, getInvestments, deleteInvestment, updateInvestment } = require("../controllers/investment");
 const router = require("express").Router();
+const verifyToken = require('../middleware/verifyToken');
 
 //Income Routes
 router.post("/add-income", addIncome);

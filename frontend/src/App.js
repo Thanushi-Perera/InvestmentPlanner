@@ -10,53 +10,37 @@ import Expenses from "./Components/Expenses/Expenses.js";
 import Investments from "./Components/Investments/Investments.js";
 import Savings from "./Components/Savings/Savings.js";
 import { useGlobalContext } from "./context/globalContext.js";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Signin from "./pages/Sign-in.js";
 import Signup from "./pages/Sign-up.js";
 
 function App() {
   const [active, setActive] = useState(1);
+  const location = useLocation();
 
   const global = useGlobalContext();
   console.log(global);
-
-  const displayData = () => {
-    switch (active) {
-      case 1:
-        return <Dashboard />;
-      case 2:
-        return <Dashboard />;
-      case 3:
-        return <Income />;
-      case 4:
-        return <Expenses />;
-      case 5:
-        return <Investments />;
-      case 6:
-        return <Savings />;
-      default:
-        return <Dashboard />;
-    }
-  };
 
   const orbMemo = useMemo(() => {
     return <Orb />;
   }, []);
 
+  const hideNav = location.pathname === '/' || location.pathname === '/Sign-up';
+
   return (
     <AppStyled bg={bg} className="App">
-      <Orb />
+      {orbMemo}
       <MainLayout>
-        <Navigation active={active} setActive={setActive} />
+        {!hideNav && <Navigation active={active} setActive={setActive} />}
         <main>
           <Routes>
-            <Route exact path="/Dashboard" element={<Dashboard />} />{" "}
-            <Route exact path="/Incomes" element={<Income />} />{" "}
-            <Route exact path="/Expenses" element={<Expenses />} />{" "}
-            <Route exact path="/Investments" element={<Investments />} />{" "}
-            <Route exact path="/Savings" element={<Savings />} />{" "}
-            <Route exact path="/" element={<Signin />} />{" "}
-            <Route exact path="/Sign-up" element={<Signup />} />{" "}
+            <Route path="/Dashboard" element={<Dashboard />} />
+            <Route path="/Incomes" element={<Income />} />
+            <Route path="/Expenses" element={<Expenses />} />
+            <Route path="/Investments" element={<Investments />} />
+            <Route path="/Savings" element={<Savings />} />
+            <Route path="/" element={<Signin />} />
+            <Route path="/Sign-up" element={<Signup />} />
           </Routes>
         </main>
       </MainLayout>

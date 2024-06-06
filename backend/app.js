@@ -3,6 +3,7 @@ const cors = require("cors");
 const { db } = require("./db/db");
 const { readdirSync } = require("fs");
 const app = express();
+const authRoutes = require('./routes/auth');
 
 require("dotenv").config();
 
@@ -16,6 +17,9 @@ app.use(cors());
 readdirSync("./routes").map((route) =>
   app.use("/api/v1", require("./routes/" + route))
 );
+
+// Auth routes
+app.use('/api/v1/auth', authRoutes);
 
 const server = () => {
   db();
