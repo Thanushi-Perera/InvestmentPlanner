@@ -1,4 +1,6 @@
 const IncomeSchema = require("../models/IncomeModel");
+const axios = require('axios');
+
 
 exports.addIncome = async (req, res) => {
   const { title, amount, description, category, type, date } = req.body;
@@ -81,4 +83,34 @@ exports.updateIncome = async (req, res) => {
     }
     return res.status(500).json({ msg: "Server Error" });
   }
+};
+
+
+exports.getIncomeRecommendation = async (req, res) => {
+  try {
+  
+    const Incomes = await IncomeSchema.find().select('category amount');
+
+
+    const formattedData = Incomes.map(income => `${income.category},${income.amount}`).join(',');
+
+
+    const requestData = {
+      rectype: "income",
+      data: [formattedData]
+    };
+    
+
+    console.log("Post Data:", requestData);
+
+
+    const apiUrl = 'https://us-central1-single-scholar-431016-j9.cloudfunctions.net/GPT_Backend';
+    const response = await axios.post(apiUrl, requestData);
+
+    // Step 4: Return the API response to the client
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error fetching investment recommendation:", error.message);
+    res.status(500).json({ msg: "Server Error" });
+  }
 };

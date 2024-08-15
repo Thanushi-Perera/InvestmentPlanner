@@ -1,4 +1,6 @@
 const ExpenseSchema = require("../models/ExpenseModel");
+const axios = require('axios');
+
 
 exports.addExpense = async (req, res) => {
   console.log(req.body);
@@ -81,5 +83,33 @@ exports.updateExpense = async (req, res) => {
         .json({ msg: "Validation Error", errors: err.errors });
     }
     return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+
+exports.getExpenseRecommendation = async (req, res) => {
+  try {
+    // Step 1: Fetch all investments with category and amount
+    const Expenses = await ExpenseSchema.find().select('category amount');
+
+    // Step 2: Format the data as required by the external API
+    const formattedData = Expenses.map(Expense => `${Expense.category},${Expense.amount}`).join(',');
+
+    const requestData = {
+      rectype: "expense",
+      data: [formattedData]
+    };
+    console.log("Post Data:", requestData);
+    
+
+    // Step 3: Send the data to the external API
+    const apiUrl = 'https://us-central1-single-scholar-431016-j9.cloudfunctions.net/GPT_Backend';
+    const response = await axios.post(apiUrl, requestData);
+
+    // Step 4: Return the API response to the client
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error fetching investment recommendation:", error.message);
+    res.status(500).json({ msg: "Server Error" });
   }
 };

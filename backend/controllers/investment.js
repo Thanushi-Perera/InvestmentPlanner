@@ -1,4 +1,5 @@
 const InvestmentSchema = require("../models/InvestmentModel");
+const axios = require('axios');
 
 exports.addInvestment = async (req, res) => {
   const { title, amount, description, category, type, date } = req.body;
@@ -82,3 +83,34 @@ exports.updateInvestment = async (req, res) => {
   }
 };
 
+
+
+
+// Other methods...
+
+exports.getInvestmentRecommendation = async (req, res) => {
+  try {
+    // Step 1: Fetch all investments with category and amount
+    const investments = await InvestmentSchema.find().select('category amount');
+
+    // Step 2: Format the data as required by the external API
+    const formattedData = investments.map(investment => ('${investment.category}',${investment.amount})).join(',');
+
+    const requestData = {
+      rectype: "invest",
+      data: [${formattedData}]
+    };
+
+    console.log("Post Data:", requestData);
+
+    // Step 3: Send the data to the external API
+    const apiUrl = 'https://us-central1-single-scholar-431016-j9.cloudfunctions.net/GPT_Backend';
+    const response = await axios.post(apiUrl, requestData);
+
+    // Step 4: Return the API response to the client
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error fetching investment recommendation:", error.message);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
